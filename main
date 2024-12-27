@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مذكراتي - تطبيق الملاحظات المتطور</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a8a8ff;
+            --accent-color: #00cec9;
+            --bg-color: #f8f9fe;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
+            --gradient: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dark-theme {
+            --bg-color: #1a1a2e;
+            --text-color: #ffffff;
+            --card-bg: #16213e;
+            --secondary-color: #0f3460;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+            background-image: 
+                radial-gradient(at 40% 20%, rgba(108, 92, 231, 0.1) 0px, transparent 50%),
+                radial-gradient(at 80% 0%, rgba(0, 206, 201, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 50%, rgba(108, 92, 231, 0.1) 0px, transparent 50%);
+        }
+
+        /* Header Styles */
+        .app-header {
+            background: var(--card-bg);
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 0 0 25px 25px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            animation: slideDown 0.5s ease;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .folder-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .folder {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .folder:hover {
+            transform: translateX(-5px);
+            background: var(--gradient);
+            color: white;
+        }
+
+        /* Note Form */
+        .note-form {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            animation: slideUp 0.5s ease;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .note-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid transparent;
+            border-radius: 12px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: var(--transition);
+        }
+
+        .note-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        /* Notes Grid */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 10px;
+        }
+
+        .note-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            animation: scaleIn 0.3s ease;
+        }
+
+        .note-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: var(--transition);
+        }
+
+        .note-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        /* Animations */
+        @keyframes slideDown {
+            from {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: var(--gradient);
+            color: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .note-count {
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+
+        .folder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .folder-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .note-select {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+        }
+
+        .note-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .folder-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .folder.active {
+            background: var(--gradient);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .note-metadata {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .date-tag {
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+
+        .folder-tag {
+            background: var(--accent-color);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tab.active {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .schedule-tag, .weekday-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .schedule-tag {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .weekday-tag {
+            background: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .note-metadata {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .week-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .day-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .day-btn.active {
+            background: var(--gradient);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .day-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .important-note {
+            border: 2px solid #ffd700;
+            background: linear-gradient(to right bottom, var(--card-bg), rgba(255, 215, 0, 0.1));
+            transform: scale(1.02);
+        }
+
+        .important-banner {
+            background: linear-gradient(to right, #ffd700, #ffa500);
+            color: var(--text-color);
+            padding: 5px 15px;
+            border-radius: 8px 8px 0 0;
+            font-weight: bold;
+            text-align: center;
+            margin: -20px -20px 15px -20px;
+        }
+
+        .important-note .note-content h3 {
+            color: #ffa500;
+        }
+
+        .important-note:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .note-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .note-metadata {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .schedule-tag, .weekday-tag, .folder-tag {
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .schedule-tag {
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .weekday-tag {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .folder-tag {
+            background: var(--secondary-color);
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="https://img.icons8.com/clouds/100/000000/note.png" alt="Logo">
+                <span>مذكراتي</span>
+            </div>
+            <button class="btn" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">
+                    <i class="fas fa-folder"></i>
+                    المجلدات
+                </h3>
+                <div class="folder-list" id="folderList"></div>
+                <button class="btn btn-primary" onclick="addNewFolder()">
+                    <i class="fas fa-plus"></i> مجلد جديد
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <form class="note-form" onsubmit="addNote(event)">
+                <div class="form-group">
+                    <label class="form-label">عنوان الملاحظة</label>
+                    <input type="text" id="noteTitle" class="note-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">المحتوى</label>
+                    <textarea id="noteContent" class="note-input" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">المجلد</label>
+                    <select id="folderSelect" class="note-input">
+                        <option value="">اختر المجلد</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="importantNote"> ملاحظة مهمة
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الموعد</label>
+                    <input type="datetime-local" id="noteSchedule" class="note-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">يوم الأسبوع</label>
+                    <select id="weekDay" class="note-input">
+                        <option value="">بدون تحديد</option>
+                        <option value="6">السبت</option>
+                        <option value="0">الأحد</option>
+                        <option value="1">الإثنين</option>
+                        <option value="2">الثلاثاء</option>
+                        <option value="3">الأربعاء</option>
+                        <option value="4">الخميس</option>
+                        <option value="5">الجمعة</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> إضافة ملاحظة
+                </button>
+            </form>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('all')">جميع الملاحظات</button>
+                <button class="tab" onclick="switchTab('important')">⭐ الملاحظات المهمة</button>
+                <button class="tab" onclick="switchTab('scheduled')">المواعيد المجدولة</button>
+                <button class="tab" onclick="switchTab('weekTasks')">مهام الأسبوع</button>
+            </div>
+
+            <div id="weekDaySelector" style="display: none;" class="week-selector">
+                <button class="day-btn" onclick="selectWeekDay(6)">السبت</button>
+                <button class="day-btn" onclick="selectWeekDay(0)">الأحد</button>
+                <button class="day-btn" onclick="selectWeekDay(1)">الإثنين</button>
+                <button class="day-btn" onclick="selectWeekDay(2)">الثلاثاء</button>
+                <button class="day-btn" onclick="selectWeekDay(3)">الأربعاء</button>
+                <button class="day-btn" onclick="selectWeekDay(4)">الخميس</button>
+                <button class="day-btn" onclick="selectWeekDay(5)">الجمعة</button>
+            </div>
+
+            <div class="notes-grid" id="notesContainer"></div>
+        </main>
+    </div>
+
+    <script>
+        // حفظ البيانات في localStorage
+        let notes = JSON.parse(localStorage.getItem('notes')) || [];
+        let folders = JSON.parse(localStorage.getItem('folders')) || [];
+        let currentFolder = '';
+        let currentTab = 'all';
+        let selectedWeekDay = null;
+
+        function saveData() {
+            localStorage.setItem('notes', JSON.stringify(notes));
+            localStorage.setItem('folders', JSON.stringify(folders));
+        }
+
+        function addNote(event) {
+            event.preventDefault();
+            const title = document.getElementById('noteTitle').value;
+            const content = document.getElementById('noteContent').value;
+            const folder = document.getElementById('folderSelect').value;
+            const important = document.getElementById('importantNote').checked;
+            const schedule = document.getElementById('noteSchedule').value;
+            const weekDay = document.getElementById('weekDay').value;
+
+            const note = {
+                id: Date.now(),
+                title: title.trim(),
+                content: content.trim(),
+                folder: folder.trim(),
+                important,
+                date: new Date().toISOString(),
+                schedule: schedule || null,
+                weekDay: weekDay || null,
+                lastEdited: null
+            };
+
+            notes.push(note);
+            saveData();
+            updateNotes();
+            resetForm();
+            showNotification('تمت إضافة الملاحظة بنجاح! 🎉');
+        }
+
+        function deleteNote(id) {
+            const noteElement = document.querySelector(`[data-note-id="${id}"]`);
+            noteElement.style.transform = 'scale(0.8)';
+            noteElement.style.opacity = '0';
+            
+            setTimeout(() => {
+                notes = notes.filter(note => note.id !== id);
+                saveData();
+                updateNotes();
+                showNotification('تم حذف الملاحظة ✨');
+            }, 300);
+        }
+
+        function updateNotes() {
+            const container = document.getElementById('notesContainer');
+            container.innerHTML = '';
+
+            let filteredNotes = filterNotesByTab(notes);
+            
+            const headerText = getTabTitle();
+            
+            container.innerHTML = `
+                <div class="folder-header">
+                    <h2>${headerText}</h2>
+                    <div class="folder-actions">
+                        <button class="btn" onclick="toggleSelectMode()">
+                            <i class="fas fa-check-square"></i> تحديد متعدد
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteSelected()" id="deleteSelectedBtn" style="display: none;">
+                            <i class="fas fa-trash"></i> حذف المحدد
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            if (filteredNotes.length === 0) {
+                container.innerHTML += `
+                    <div class="empty-state">
+                        <i class="fas fa-${getEmptyStateIcon()}"></i>
+                        <p>لا توجد ملاحظات ${getEmptyStateMessage()}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredNotes.forEach(note => {
+                const noteElement = document.createElement('div');
+                noteElement.className = `note-card ${note.important ? 'important-note' : ''}`;
+                noteElement.dataset.noteId = note.id;
+                noteElement.innerHTML = `
+                    <div class="note-select" style="display: none;">
+                        <input type="checkbox" class="note-checkbox">
+                    </div>
+                    ${note.important ? '<div class="important-banner">ملاحظة مهمة ⭐</div>' : ''}
+                    <div class="note-content">
+                        <h3>${note.title}</h3>
+                        <p>${note.content}</p>
+                        <div class="note-metadata">
+                            ${note.folder ? `<span class="folder-tag">📁 ${note.folder}</span>` : ''}
+                            ${note.schedule ? `
+                                <span class="schedule-tag">
+                                    <i class="fas fa-clock"></i>
+                                    ${formatDateTime(note.schedule)}
+                                </span>
+                            ` : ''}
+                            ${note.weekDay ? `
+                                <span class="weekday-tag">
+                                    <i class="fas fa-calendar-day"></i>
+                                    ${getWeekDayName(note.weekDay)}
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="note-actions">
+                        <button class="btn" onclick="editNote(${note.id})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn" onclick="deleteNote(${note.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(noteElement);
+            });
+        }
+
+        function addNewFolder() {
+            const folderName = prompt('أدخل اسم المجلد الجديد:');
+            if (folderName) {
+                folders.push(folderName);
+                saveData();
+                updateFolderList();
+                showNotification('تم إضافة المجلد بنجاح! 📁');
+            }
+        }
+
+        function updateFolderList() {
+            const folderList = document.getElementById('folderList');
+            const folderSelect = document.getElementById('folderSelect');
+            
+            folderList.innerHTML = `
+                <div class="folder" onclick="showAllNotes()">
+                    <i class="fas fa-folder"></i>
+                    <span>جميع الملاحظات</span>
+                    <span class="note-count">${notes.length}</span>
+                </div>
+            `;
+            folderSelect.innerHTML = '<option value="">اختر المجلد</option>';
+
+            folders.forEach(folder => {
+                const folderNotes = notes.filter(note => note.folder === folder);
+                folderList.innerHTML += `
+                    <div class="folder" onclick="showFolderNotes('${folder}')">
+                        <i class="fas fa-folder"></i>
+                        <span>${folder}</span>
+                        <span class="note-count">${folderNotes.length}</span>
+                    </div>
+                `;
+                folderSelect.innerHTML += `<option value="${folder}">${folder}</option>`;
+            });
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 2700);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            const icon = document.querySelector('.btn i.fas');
+            if (icon) {
+                icon.classList.toggle('fa-moon');
+                icon.classList.toggle('fa-sun');
+            }
+        }
+
+        // دالة لعرض جميع الملاحظات
+        function showAllNotes() {
+            currentFolder = '';
+            updateNotes();
+        }
+
+        // دالة لعرض ملاحظات مجلد معين
+        function showFolderNotes(folder) {
+            currentFolder = folder;
+            const filteredNotes = notes.filter(note => note.folder === folder);
+            
+            if (filteredNotes.length === 0) {
+                showNotification(`لا توجد ملاحظات في مجلد "${folder}"`, 'info');
+            }
+            
+            updateNotes();
+            // تحديث العنوان النشط في القائمة الجانبية
+            updateActiveFolderUI(folder);
+        }
+
+        // إضافة دالة لتحديث واجهة المجلدات النشطة
+        function updateActiveFolderUI(activeFolder) {
+            const folderElements = document.querySelectorAll('.folder');
+            folderElements.forEach(folder => {
+                folder.classList.remove('active');
+                if (folder.querySelector('span').textContent === activeFolder) {
+                    folder.classList.add('active');
+                }
+            });
+        }
+
+        // وضع التحديد امتعدد
+        let selectMode = false;
+
+        function toggleSelectMode() {
+            selectMode = !selectMode;
+            const checkboxes = document.querySelectorAll('.note-select');
+            const deleteBtn = document.getElementById('deleteSelectedBtn');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.style.display = selectMode ? 'block' : 'none';
+            });
+            deleteBtn.style.display = selectMode ? 'block' : 'none';
+        }
+
+        // حذف الملاحظات المحددة
+        function deleteSelected() {
+            const selectedNotes = document.querySelectorAll('.note-checkbox:checked');
+            if (selectedNotes.length === 0) {
+                showNotification('لم يتم تحديد أي ملاحظات', 'warning');
+                return;
+            }
+
+            if (confirm(`هل أنت متأكد من حذف ${selectedNotes.length} ملاحظات؟`)) {
+                selectedNotes.forEach(checkbox => {
+                    const noteId = parseInt(checkbox.closest('.note-card').dataset.noteId);
+                    notes = notes.filter(note => note.id !== noteId);
+                });
+                saveData();
+                updateNotes();
+                toggleSelectMode();
+                showNotification('تم حذف الملاحظات المحددة بنجاح');
+            }
+        }
+
+        // تعديل الملاحظة
+        function editNote(id) {
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+
+            document.getElementById('noteTitle').value = note.title;
+            document.getElementById('noteContent').value = note.content;
+            document.getElementById('folderSelect').value = note.folder || '';
+            document.getElementById('importantNote').checked = note.important;
+
+            // تحويل زر الإضافة إلى زر تحديث
+            const submitBtn = document.querySelector('.note-form button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-save"></i> تحديث الملاحظة';
+            submitBtn.onclick = (e) => {
+                e.preventDefault();
+                updateExistingNote(id);
+            };
+
+            // التمرير إلى نموذج التعديل
+            document.querySelector('.note-form').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // تحديث ملاحظة موجودة
+        function updateExistingNote(id) {
+            const noteIndex = notes.findIndex(n => n.id === id);
+            if (noteIndex === -1) return;
+
+            notes[noteIndex] = {
+                ...notes[noteIndex],
+                title: document.getElementById('noteTitle').value,
+                content: document.getElementById('noteContent').value,
+                folder: document.getElementById('folderSelect').value,
+                important: document.getElementById('importantNote').checked,
+                lastEdited: new Date().toISOString()
+            };
+
+            saveData();
+            updateNotes();
+            resetForm();
+            showNotification('تم تحديث الملاحظة بنجاح');
+        }
+
+        // إعادة تعيين النموذج
+        function resetForm() {
+            document.querySelector('.note-form').reset();
+            const submitBtn = document.querySelector('.note-form button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-plus"></i> إضافة ملاحظة';
+            submitBtn.onclick = null;
+        }
+
+        // تهيئة التطبيق
+        updateFolderList();
+        updateNotes();
+
+        function switchTab(tab) {
+            currentTab = tab;
+            selectedWeekDay = null;
+            
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelector(`.tab[onclick="switchTab('${tab}')"]`).classList.add('active');
+            
+            // إظهار/إخفاء محدد الأيام
+            const weekDaySelector = document.getElementById('weekDaySelector');
+            if (weekDaySelector) {
+                weekDaySelector.style.display = tab === 'weekTasks' ? 'flex' : 'none';
+            }
+            
+            // إعادة تعيين الأزرار النشطة في محدد الأيام
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            updateNotes();
+        }
+
+        function selectWeekDay(day) {
+            selectedWeekDay = day;
+            document.querySelectorAll('.day-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.day === day.toString());
+            });
+            updateNotes();
+        }
+
+        function filterNotesByTab(notes) {
+            switch(currentTab) {
+                case 'important':
+                    return notes.filter(note => note.important);
+                case 'scheduled':
+                    return notes.filter(note => note.schedule);
+                case 'weekTasks':
+                    if (selectedWeekDay !== null) {
+                        return notes.filter(note => note.weekDay === selectedWeekDay.toString());
+                    }
+                    return notes.filter(note => note.weekDay !== null);
+                default:
+                    return currentFolder ? notes.filter(note => note.folder === currentFolder) : notes;
+            }
+        }
+
+        function getTabTitle() {
+            switch(currentTab) {
+                case 'important':
+                    return '⭐ الملاحظات المهمة';
+                case 'scheduled':
+                    return '📅 المواعيد المجدولة';
+                case 'weekTasks':
+                    if (selectedWeekDay !== null) {
+                        return `📆 مهام ${getWeekDayName(selectedWeekDay)}`;
+                    }
+                    return '📆 مهام الأسبوع';
+                default:
+                    return currentFolder ? `📁 مجلد: ${currentFolder}` : '📝 جميع الملاحظات';
+            }
+        }
+
+        function getEmptyStateMessage() {
+            switch(currentTab) {
+                case 'important':
+                    return 'مهمة';
+                case 'scheduled':
+                    return 'مجدولة';
+                case 'weekTasks':
+                    if (selectedWeekDay !== null) {
+                        return `في ${getWeekDayName(selectedWeekDay)}`;
+                    }
+                    return 'في الأسبوع';
+                default:
+                    return currentFolder ? 'في هذا المجلد' : '';
+            }
+        }
+
+        function getEmptyStateIcon() {
+            switch(currentTab) {
+                case 'important':
+                    return 'star';
+                case 'scheduled':
+                    return 'calendar-alt';
+                case 'weekTasks':
+                    return 'calendar-week';
+                default:
+                    return 'sticky-note';
+            }
+        }
+
+        function formatDateTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('ar-SA', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function getWeekDayName(day) {
+            const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            return days[parseInt(day)];
+        }
+    </script>
+</body>
+</html>
